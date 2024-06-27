@@ -73,4 +73,36 @@ auto flag_argument::required_verify() const -> bool {
     return !_required || _data.has_value();
 }
 
+
+positional_argument::positional_argument(argument_parser* const _p) : argument(_p) {}
+auto positional_argument::has_value() const -> bool {
+    return _data.has_value();
+}
+auto positional_argument::help(const std::string& _c) -> self& {
+    _comment = _c;
+    return *this;
+}
+auto positional_argument::help() const -> const std::string& {
+    return _comment;
+}
+auto positional_argument::required() -> self& {
+    _required = true;
+    return *this;
+}
+auto positional_argument::set_value(const std::string& _s) -> void {
+    if (!_choices.empty() && !_choices.contains(_s)) {
+        throw std::out_of_range("not in choices.");
+    }
+    if (_store_handler == nullptr) {
+        _data = std::make_optional(_s);
+    }
+    else {
+        _data = _store_handler->save(_s);
+    }
+}
+auto positional_argument::required_verify() const -> bool {
+    return !_required || _data.has_value();
+}
+auto positional_argument::_M_choices() -> void {}
+
 }

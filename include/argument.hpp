@@ -56,18 +56,6 @@ protected:
     bool _required = false;
 };
 
-// class positional_argument : public argument {
-//     typedef positional_argument self;
-// public:
-//     template <typename _Tp = std::string> auto value() const -> _Tp;
-//     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
-// private:
-//     template <typename... _Args> auto _M_choices(const std::string&, _Args&&... _args) -> void;
-//     template <typename... _Args> auto _M_choices() -> void;
-// private:
-//     std::optional<std::any> _data;
-//     std::vector<const std::string> _choices;
-// };
 class optional_argument : public argument {
     typedef optional_argument self;
     friend class argument_parser;
@@ -110,6 +98,28 @@ private:
 private:
     std::optional<bool> _data;
 };
+class positional_argument : public argument {
+    typedef positional_argument self;
+    friend class argument_parser;
+public:
+    positional_argument(argument_parser* const);
+    auto has_value() const -> bool;
+    template <typename _Tp = std::string> auto value() const -> _Tp;
+    template <typename... _Args> auto choices(_Args&&... _args) -> self&;
+    template <typename _Tp> auto store_as() -> self&;
+    auto help(const std::string&) -> self&;
+    auto help() const -> const std::string&;
+    auto required() -> self&;
+private:
+    auto set_value(const std::string&) -> void;
+    auto required_verify() const -> bool;
+    template <typename... _Args> auto _M_choices(const std::string&, _Args&&... _args) -> void;
+    auto _M_choices() -> void;
+private:
+    std::optional<std::any> _data = std::nullopt;
+    std::unordered_set<std::string> _choices;
+    virtual_store_handler* _store_handler = nullptr;
+};
 
 
 template <typename _Tp> auto optional_argument::value() const -> _Tp {
@@ -125,6 +135,24 @@ template <typename _Tp> auto optional_argument::store_as() -> self& {
     return *this;
 }
 template <typename... _Args> auto optional_argument::_M_choices(const std::string& _s, _Args&&... _args) -> void {
+    _choices.insert(_s);
+    _M_choices(std::forward<_Args>(_args)...);
+}
+
+
+template <typename _Tp> auto positional_argument::value() const -> _Tp {
+    return std::any_cast<_Tp>(_data.value());
+}
+template <typename... _Args> auto positional_argument::choices(_Args&&... _args) -> self& {
+    _M_choices(std::forward<_Args>(_args)...);
+    return *this;
+}
+template <typename _Tp> auto positional_argument::store_as() -> self& {
+    delete _store_handler; _store_handler = nullptr;
+    _store_handler = new store_handler<_Tp>();
+    return *this;
+}
+template <typename... _Args> auto positional_argument::_M_choices(const std::string& _s, _Args&&... _args) -> void {
     _choices.insert(_s);
     _M_choices(std::forward<_Args>(_args)...);
 }
