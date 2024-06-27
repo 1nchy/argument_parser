@@ -33,9 +33,14 @@ auto argument_parser::parse(const std::vector<std::string>& _args) -> bool {
 
 auto argument_parser::_M_attach_optional_argument(std::shared_ptr<optional_argument>)
 -> void {}
+auto argument_parser::_M_attach_flag_argument(std::shared_ptr<flag_argument>)
+-> void {}
 auto argument_parser::_M_required_verify() const
 -> bool {
     for (const auto& _p : _optional_arguments) {
+        if (!_p.second->required_verify()) return false;
+    }
+    for (const auto& _p : _flag_arguments) {
         if (!_p.second->required_verify()) return false;
     }
     return true;

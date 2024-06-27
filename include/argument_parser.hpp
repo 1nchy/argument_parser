@@ -24,11 +24,10 @@ public:
     // auto add_positional_argument(size_t) -> positional_argument&;
     template <typename... _Args> auto
         add_optional_argument(_Args&&... _args) -> optional_argument&;
-    // template <typename... _Args> auto
-    //     add_flag_argument(_Args&&... _args) -> flag_argument&;
-    // get normal argument
+    template <typename... _Args> auto
+        add_flag_argument(_Args&&... _args) -> flag_argument&;
     auto get_option(const std::string&) const -> const optional_argument&;
-    // get anonymous argument
+    auto get_flag(const std::string&) const -> const flag_argument&;
     // auto get(size_t) const -> const argument&;
     auto parse(int, const char* const*) -> bool;
     auto parse(const std::vector<std::string>&) -> bool;
@@ -36,10 +35,13 @@ private:
     template <typename... _Args> auto
         _M_attach_optional_argument(std::shared_ptr<optional_argument>, const std::string&, _Args&&... _args) -> void;
     auto _M_attach_optional_argument(std::shared_ptr<optional_argument>) -> void;
+    template <typename... _Args> auto
+        _M_attach_flag_argument(std::shared_ptr<flag_argument>, const std::string&, _Args&&... _args) -> void;
+    auto _M_attach_flag_argument(std::shared_ptr<flag_argument>) -> void;
     auto _M_required_verify() const -> bool;
 private:
     std::unordered_map<std::string, std::shared_ptr<optional_argument>> _optional_arguments;
-    // std::unordered_map<std::string, std::shared_ptr<flag_argument>> _flag_arguments;
+    std::unordered_map<std::string, std::shared_ptr<flag_argument>> _flag_arguments;
     // std::vector<std::shared_ptr<positional_argument>> _positional_arguments;
 
     // std::list<std::shared_ptr<optional_argument>> _required_optional_arguments_list;
@@ -63,18 +65,16 @@ argument_parser::add_optional_argument(_Args&&... _args)
     _M_attach_optional_argument(_ptr, std::forward<_Args>(_args)...);
     return *_ptr;
 }
-// template <typename... _Args> auto
-// argument_parser::add_flag_argument(_Args&&... _args)
-// -> flag_argument& {
-//     auto _ptr = std::make_shared<argument>();
-//     if (sizeof...(_Args) == 0) {
-//         _M_attach_anonymous_argument(_ptr);
-//     }
-//     else {
-//         _M_attach_optional_argument(_ptr, std::forward<_Args>(_args)...);
-//     }
-//     return *_ptr;
-// }
+template <typename... _Args> auto
+argument_parser::add_flag_argument(_Args&&... _args)
+-> flag_argument& {
+    if (sizeof...(_Args) == 0) {
+        throw std::length_error("zero argument.");
+    }
+    auto _ptr = std::make_shared<flag_argument>(this);
+    _M_attach_flag_argument(_ptr, std::forward<_Args>(_args)...);
+    return *_ptr;
+}
 
 
 template <typename... _Args> auto
@@ -82,6 +82,12 @@ argument_parser::_M_attach_optional_argument(std::shared_ptr<optional_argument> 
 -> void {
     _optional_arguments[_k] = _ptr;
     _M_attach_optional_argument(_ptr, std::forward<_Args>(_args)...);
+}
+template <typename... _Args> auto
+argument_parser::_M_attach_flag_argument(std::shared_ptr<flag_argument> _ptr, const std::string& _k, _Args&&... _args)
+-> void {
+    _flag_arguments[_k] = _ptr;
+    _M_attach_flag_argument(_ptr, std::forward<_Args>(_args)...);
 }
 
 }

@@ -43,4 +43,34 @@ auto optional_argument::required_verify() const -> bool {
 }
 auto optional_argument::_M_choices() -> void {}
 
+
+flag_argument::flag_argument(argument_parser* const _p) : argument(_p) {}
+auto flag_argument::set_default(bool _b) -> self& {
+    set_value(_b);
+    return *this;
+}
+auto flag_argument::has_value() const -> bool {
+    return _data.has_value();
+}
+auto flag_argument::value() const -> bool {
+    return _data.value();
+}
+auto flag_argument::help(const std::string& _c) -> self& {
+    _comment = _c;
+    return *this;
+}
+auto flag_argument::help() const -> const std::string& {
+    return _comment;
+}
+auto flag_argument::required() -> self& {
+    _required = true;
+    return *this;
+}
+auto flag_argument::set_value(bool _b) -> void {
+    _data = std::make_optional(_b);
+}
+auto flag_argument::required_verify() const -> bool {
+    return !_required || _data.has_value();
+}
+
 }

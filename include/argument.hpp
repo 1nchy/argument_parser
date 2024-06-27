@@ -93,14 +93,23 @@ private:
     std::unordered_set<std::string> _choices;
     virtual_store_handler* _store_handler = nullptr;
 };
-// class flag_argument : public argument {
-//     typedef flag_argument self;
-// public:
-//     auto set_default(bool) -> self&;
-//     auto value() const -> bool;
-// private:
-//     std::optional<bool> _data;
-// };
+class flag_argument : public argument {
+    typedef flag_argument self;
+    friend class argument_parser;
+public:
+    flag_argument(argument_parser* const);
+    auto set_default(bool) -> self&;
+    auto has_value() const -> bool;
+    auto value() const -> bool;
+    auto help(const std::string&) -> self&;
+    auto help() const -> const std::string&;
+    auto required() -> self&;
+private:
+    auto set_value(bool) -> void;
+    auto required_verify() const -> bool;
+private:
+    std::optional<bool> _data;
+};
 
 
 template <typename _Tp> auto optional_argument::value() const -> _Tp {
