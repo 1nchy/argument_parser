@@ -14,7 +14,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
-set(THIRD_LIB_NAME third_lib)  # replace your third lib name
+set(THIRD_LIB_NAME argument_parser)  # replace your third lib name
 find_library(third_lib_${THIRD_LIB_NAME} ${THIRD_LIB_NAME} ../../lib)
 if (third_lib_${THIRD_LIB_NAME})
     target_link_libraries(${PROJECT_NAME}

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(third_lib)  # replace your third lib name
+project(argument_parser)  # replace your third lib name
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE "Release")
