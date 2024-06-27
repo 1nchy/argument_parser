@@ -108,6 +108,7 @@ template <typename... _Args> auto optional_argument::choices(_Args&&... _args) -
     return *this;
 }
 template <typename _Tp> auto optional_argument::store_as() -> self& {
+    delete _store_handler; _store_handler = nullptr;
     _store_handler = new store_handler<_Tp>();
     return *this;
 }
