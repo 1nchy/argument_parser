@@ -48,14 +48,12 @@ public:
     argument(const self&) = delete;
     argument(self&&) = default;
     self& operator=(const self&) = delete;
-    auto help(const std::string&) -> self&;
-    auto help() const -> const std::string&;
 
     friend class argument_parser;
 protected:
     argument_parser* _parser = nullptr;
-private:
     std::string _comment;
+    bool _required = false;
 };
 
 // class positional_argument : public argument {
@@ -72,17 +70,22 @@ private:
 // };
 class optional_argument : public argument {
     typedef optional_argument self;
+    friend class argument_parser;
 public:
     optional_argument(argument_parser* const);
     virtual ~optional_argument();
     auto set_default(const std::string&) -> self&;
+    auto has_value() const -> bool;
     template <typename _Tp = std::string> auto value() const -> _Tp;
     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
     template <typename _Tp> auto store_as() -> self&;
-    // auto required() -> self&;
+    auto help(const std::string&) -> self&;
+    auto help() const -> const std::string&;
+    auto required() -> self&;
     // action
 private:
     auto set_value(const std::string&) -> void;
+    auto required_verify() const -> bool;
     template <typename... _Args> auto _M_choices(const std::string&, _Args&&... _args) -> void;
     auto _M_choices() -> void;
 private:

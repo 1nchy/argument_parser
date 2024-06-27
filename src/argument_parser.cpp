@@ -11,10 +11,10 @@ auto argument_parser::get_option(const std::string& _k) const
 //     return *(_anonymous_arguments.at(_k));
 // }
 
-auto argument_parser::parse(int _argc, const char* const* _argv) -> void {
-    parse({_argv, _argc + _argv});
+auto argument_parser::parse(int _argc, const char* const* _argv) -> bool {
+    return parse({_argv, _argc + _argv});
 }
-auto argument_parser::parse(const std::vector<std::string>& _args) -> void {
+auto argument_parser::parse(const std::vector<std::string>& _args) -> bool {
     for (auto _i = _args.cbegin(); _i != _args.cend(); ++_i) {
         // const std::string& _arg = *_i;
         // size_t _equal_pos = _arg.find_first_of('=');
@@ -28,12 +28,16 @@ auto argument_parser::parse(const std::vector<std::string>& _args) -> void {
         //     _anonymous_arguments
         // }
     }
+    return _M_required_verify();
 }
 
 auto argument_parser::_M_attach_optional_argument(std::shared_ptr<optional_argument>)
 -> void {}
-// auto argument_parser::_M_attach_anonymous_argument(std::shared_ptr<argument> _ptr)
-// -> void {
-//     _anonymous_arguments.push_back(_ptr);
-// }
+auto argument_parser::_M_required_verify() const
+-> bool {
+    for (const auto& _p : _optional_arguments) {
+        if (!_p.second->required_verify()) return false;
+    }
+    return true;
+}
 }

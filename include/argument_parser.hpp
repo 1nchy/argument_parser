@@ -30,19 +30,19 @@ public:
     auto get_option(const std::string&) const -> const optional_argument&;
     // get anonymous argument
     // auto get(size_t) const -> const argument&;
-    void parse(int, const char* const*);
-    void parse(const std::vector<std::string>&);
+    auto parse(int, const char* const*) -> bool;
+    auto parse(const std::vector<std::string>&) -> bool;
 private:
     template <typename... _Args> auto
         _M_attach_optional_argument(std::shared_ptr<optional_argument>, const std::string&, _Args&&... _args) -> void;
     auto _M_attach_optional_argument(std::shared_ptr<optional_argument>) -> void;
-    // auto _M_attach_anonymous_argument(std::shared_ptr<argument>) -> void;
+    auto _M_required_verify() const -> bool;
 private:
     std::unordered_map<std::string, std::shared_ptr<optional_argument>> _optional_arguments;
     // std::unordered_map<std::string, std::shared_ptr<flag_argument>> _flag_arguments;
     // std::vector<std::shared_ptr<positional_argument>> _positional_arguments;
 
-    std::list<std::shared_ptr<optional_argument>> _required_optional_arguments_list;
+    // std::list<std::shared_ptr<optional_argument>> _required_optional_arguments_list;
     // std::list<std::shared_ptr<flag_argument>> _required_flag_arguments_list;
     // std::list<std::shared_ptr<positional_argument>> _required_positional_arguments_list;
 };
