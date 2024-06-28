@@ -51,9 +51,9 @@ public:
 
     friend class argument_parser;
 protected:
-    argument_parser* _parser = nullptr;
-    std::string _comment;
-    bool _required = false;
+    argument_parser* _parser = nullptr; // 解析器指针
+    std::string _comment;               // 参数说明
+    bool _required = false;             // 参数是否必需
 };
 
 class optional_argument : public argument {
