@@ -9,13 +9,11 @@
 !/src/*
 !/include
 !/include/*
+!/third
+!/third/*
 
 !/doc
 !/doc/*
 
 !/example
 !/example/*
-
-!/.vscode
-!/.vscode/launch.json
-!/.vscode/tasks.json
