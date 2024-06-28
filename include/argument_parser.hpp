@@ -21,11 +21,26 @@ public:
     argument_parser(self&&) = default;
     self& operator=(const self&) = delete;
     virtual ~argument_parser() = default;
+    /**
+     * @brief add optional argument
+     * @param _args string key of argument
+     * @return reference to argument object
+     */
     template <typename... _Args> auto
         add_optional_argument(_Args&&... _args) -> optional_argument&;
+    /**
+     * @brief add flag argument
+     * @param _args string key of argument
+     * @return reference to argument object
+     */
     template <typename... _Args> auto
         add_flag_argument(_Args&&... _args) -> flag_argument&;
-    auto add_positional_argument(size_t) -> positional_argument&;
+    /**
+     * @brief add positional argument
+     * @param _k serial position of argument
+     * @return reference to argument object
+     */
+    auto add_positional_argument(size_t _k) -> positional_argument&;
     auto get_option(const std::string&) const -> const optional_argument&;
     auto get_flag(const std::string&) const -> const flag_argument&;
     auto get_position(size_t) const -> const positional_argument&;

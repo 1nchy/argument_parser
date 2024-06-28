@@ -5,6 +5,7 @@ int main(int _argc, char* _argv[]) {
     _parser.add_optional_argument("--std").store_as<unsigned>().set_default("3").help("standard").required();
     _parser.add_optional_argument("-o").help("output");
     _parser.add_flag_argument("-Wall").set_default(false).help("all warning");
+    _parser.add_positional_argument(0).required().help("compiler");
     const std::vector<std::string> _args = {
         "gcc", "--std=11", "-Wall", "-o", "main", "main.cpp"
     };
