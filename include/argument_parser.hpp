@@ -40,6 +40,11 @@ private:
     auto _M_attach_flag_argument(std::shared_ptr<flag_argument>) -> void;
     auto _M_attach_positional_argument(std::shared_ptr<positional_argument>, size_t) -> void;
     auto _M_required_verify() const -> bool;
+    auto _M_is_optional_argument(const std::string&) const -> bool;
+    auto _M_is_flag_argument(const std::string&) const -> bool;
+    auto _M_update_optional_argument(const std::string&, const std::string&) -> void;
+    auto _M_update_flag_argument(const std::string&) -> void;
+    auto _M_update_positional_argument(size_t, const std::string&) -> void;
 private:
     std::unordered_map<std::string, std::shared_ptr<optional_argument>> _optional_arguments;
     std::unordered_map<std::string, std::shared_ptr<flag_argument>> _flag_arguments;
@@ -68,12 +73,6 @@ argument_parser::add_flag_argument(_Args&&... _args)
     }
     auto _ptr = std::make_shared<flag_argument>(this);
     _M_attach_flag_argument(_ptr, std::forward<_Args>(_args)...);
-    return *_ptr;
-}
-auto argument_parser::add_positional_argument(size_t _k)
--> positional_argument& {
-    auto _ptr = std::make_shared<positional_argument>(this);
-    _M_attach_positional_argument(_ptr, _k);
     return *_ptr;
 }
 

@@ -32,7 +32,7 @@ auto optional_argument::set_value(const std::string& _s) -> void {
         throw std::out_of_range("not in choices.");
     }
     if (_store_handler == nullptr) {
-        _data = std::make_optional(_s);
+        _data = _s;
     }
     else {
         _data = _store_handler->save(_s);
@@ -94,7 +94,7 @@ auto positional_argument::set_value(const std::string& _s) -> void {
         throw std::out_of_range("not in choices.");
     }
     if (_store_handler == nullptr) {
-        _data = std::make_optional(_s);
+        _data = _s;
     }
     else {
         _data = _store_handler->save(_s);
