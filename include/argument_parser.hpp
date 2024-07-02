@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <memory>
 
+#include "trie_tree.hpp"
+
 namespace icy {
 
 class argument_parser;
@@ -68,6 +70,7 @@ private:
     // std::list<std::shared_ptr<optional_argument>> _required_optional_arguments_list;
     // std::list<std::shared_ptr<flag_argument>> _required_flag_arguments_list;
     // std::list<std::shared_ptr<positional_argument>> _required_positional_arguments_list;
+    trie_tree _optional_keys;
 };
 
 template <typename... _Args> auto
@@ -96,6 +99,7 @@ template <typename... _Args> auto
 argument_parser::_M_attach_optional_argument(std::shared_ptr<optional_argument> _ptr, const std::string& _k, _Args&&... _args)
 -> void {
     _optional_arguments[_k] = _ptr;
+    _optional_keys.add(_k);
     _M_attach_optional_argument(_ptr, std::forward<_Args>(_args)...);
 }
 template <typename... _Args> auto

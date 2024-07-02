@@ -8,6 +8,8 @@
 
 ### 使用
 
+该库依赖于 [trie_tree](https://github.com/1nchy/trie_tree)，需要用户自行编写 Findtrie_tree.cmake 以完成配置。
+
 在项目的具体使用方法，详见 [1nchy/project_template](https://github.com/1nchy/project_template)。
 
 ### 示例

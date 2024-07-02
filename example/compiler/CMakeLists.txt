@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.26)
-project(usage) # replace your example name
+project(compiler) # replace your example name
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE "Debug")
 
 set(PROJECT_SOURCE_TARGET ${PROJECT_NAME}_source_target)
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include_directories(../../include)
 
@@ -26,3 +28,11 @@ add_subdirectory(src)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_TARGET}
 )
+
+find_package(trie_tree REQUIRED MODULE)
+if (trie_tree_FOUND)
+    include_directories(${trie_tree_INCLUDE_DIR})
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+        ${trie_tree_LIBRARIES}
+    )
+endif (trie_tree_FOUND)
