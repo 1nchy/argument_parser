@@ -64,9 +64,12 @@ public:
     virtual ~optional_argument();
     auto set_default(const std::string&) -> self&;
     auto has_value() const -> bool;
-    template <typename _Tp = std::string> auto value() const -> _Tp;
+    auto size() const -> size_t;
+    template <typename _Tp = std::string> auto value(size_t = 0) const -> _Tp;
+public:
     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
     template <typename _Tp> auto store_as() -> self&;
+    auto append() -> self&;
     auto help(const std::string&) -> self&;
     auto help() const -> const std::string&;
     auto required() -> self&;
@@ -76,8 +79,10 @@ private:
     auto required_verify() const -> bool;
     template <typename... _Args> auto _M_choices(const std::string&, _Args&&... _args) -> void;
     auto _M_choices() -> void;
+    auto _M_set_value(const std::any&) -> void;
 private:
-    std::optional<std::any> _data = std::nullopt;
+    std::vector<std::any> _data;
+    bool _append = false;
     std::unordered_set<std::string> _choices;
     virtual_store_handler* _store_handler = nullptr;
 };
@@ -86,9 +91,10 @@ class flag_argument : public argument {
     friend class argument_parser;
 public:
     flag_argument(argument_parser* const);
-    auto set_default(bool) -> self&;
     auto has_value() const -> bool;
     auto value() const -> bool;
+public:
+    auto set_default(bool) -> self&;
     auto help(const std::string&) -> self&;
     auto help() const -> const std::string&;
     auto required() -> self&;
@@ -105,6 +111,7 @@ public:
     positional_argument(argument_parser* const);
     auto has_value() const -> bool;
     template <typename _Tp = std::string> auto value() const -> _Tp;
+public:
     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
     template <typename _Tp> auto store_as() -> self&;
     auto help(const std::string&) -> self&;
@@ -122,8 +129,8 @@ private:
 };
 
 
-template <typename _Tp> auto optional_argument::value() const -> _Tp {
-    return std::any_cast<_Tp>(_data.value());
+template <typename _Tp> auto optional_argument::value(size_t _i) const -> _Tp {
+    return std::any_cast<_Tp>(_data.at(_i));
 }
 template <typename... _Args> auto optional_argument::choices(_Args&&... _args) -> self& {
     _M_choices(std::forward<_Args>(_args)...);
