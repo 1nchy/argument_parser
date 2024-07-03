@@ -181,7 +181,6 @@ template <typename... _Args> auto optional_argument::_M_choices(const std::strin
 /**
  * @brief get argument value in specified type
  * @tparam _Tp specified type
- * @throw std::out_of_range if %_i is an invalid index
  * @throw std::bad_any_cast if fail to cast
  */
 template <typename _Tp> auto positional_argument::value() const -> _Tp {
