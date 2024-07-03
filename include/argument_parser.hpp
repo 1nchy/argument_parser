@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 
 #include "trie_tree.hpp"
@@ -18,7 +19,7 @@ class argument_parser;
 class argument_parser {
     typedef argument_parser self;
 public:
-    argument_parser() = default;
+    argument_parser(const std::string& _prefix_chars = "-");
     argument_parser(const self&) = delete;
     argument_parser(self&&) = default;
     self& operator=(const self&) = delete;
@@ -67,9 +68,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<flag_argument>> _flag_arguments;
     std::unordered_map<size_t, std::shared_ptr<positional_argument>> _positional_arguments;
 
-    // std::list<std::shared_ptr<optional_argument>> _required_optional_arguments_list;
-    // std::list<std::shared_ptr<flag_argument>> _required_flag_arguments_list;
-    // std::list<std::shared_ptr<positional_argument>> _required_positional_arguments_list;
+    const std::unordered_set<char> _prefix_chars;
     trie_tree _optional_keys;
 };
 

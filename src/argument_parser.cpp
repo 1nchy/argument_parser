@@ -2,6 +2,9 @@
 
 namespace icy {
 
+argument_parser::argument_parser(const std::string& _chars)
+: _prefix_chars(_chars.cbegin(), _chars.cend()) {}
+
 auto argument_parser::add_positional_argument(size_t _k)
 -> positional_argument& {
     auto _ptr = std::make_shared<positional_argument>(this);
@@ -27,34 +30,29 @@ auto argument_parser::parse(int _argc, const char* const* _argv) -> bool {
 }
 auto argument_parser::parse(const std::vector<std::string>& _args) -> bool {
     auto _i = _args.cbegin();
-    size_t _position = 0;
     auto _M_try_optional_argument = [&](const std::string& _s) -> bool {
-        size_t _pivot = _s.find_first_of('=');
-        if (_pivot == std::string::npos) { // '=' not exist
-            if (this->_M_is_optional_argument(_s) && _i + 1 != _args.cend()) {
-                ++_i;
-                const std::string& _v = *_i;
-                this->_M_update_optional_argument(_s, _v);
-                return true;
-            }
-        }
-        else {
-            const std::string& _k = _s.substr(0, _pivot);
-            if (this->_M_is_optional_argument(_k)) {
-                const std::string& _v = _s.substr(_pivot + 1);
-                this->_M_update_optional_argument(_k, _v);
-                return true;
-            }
-        }
-        return false;
+        if (_s.empty()) return false;
+        if (!this->_prefix_chars.contains(_s.at(0))) return false;
+        // _s start with character in %_prefix_chars
+        auto _l = _s.cbegin() + 1;
+        auto _r = _l + this->_optional_keys.longest_match(_l, _s.cend());
+        if (_r == _l) return false;
+        const std::string _k(_l, _r);
+        const std::string& _v = (_r == _s.cend()) ? *(++_i) : _s.substr(_r - _s.cbegin());
+        this->_M_update_optional_argument(_k, _v);
+        return true;
     };
     auto _M_try_flag_argument = [&](const std::string& _s) -> bool {
-        if (this->_M_is_flag_argument(_s)) {
-            this->_M_update_flag_argument(_s);
+        if (_s.empty()) return false;
+        if (!this->_prefix_chars.contains(_s.at(0))) return false;
+        const std::string _k = _s.substr(1);
+        if (this->_M_is_flag_argument(_k)) {
+            this->_M_update_flag_argument(_k);
             return true;
         }
         return false;
     };
+    size_t _position = 0;
     auto _M_try_positional_argument = [&](const std::string& _s) -> bool {
         this->_M_update_positional_argument(_position++, _s);
         return true;
