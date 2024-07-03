@@ -13,11 +13,6 @@
 
 namespace icy {
 
-// typedef enum {
-//     single,
-//     multiple,
-// } optional_argument_subtype;
-
 class argument;
 class positional_argument;
 class optional_argument;
@@ -65,13 +60,22 @@ public:
     auto set_default(const std::string&) -> self&;
     auto has_value() const -> bool;
     auto size() const -> size_t;
-    template <typename _Tp = std::string> auto value(size_t = 0) const -> _Tp;
+    template <typename _Tp = std::string> auto value(size_t _i = 0) const -> _Tp;
 public:
     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
     template <typename _Tp> auto store_as() -> self&;
+    /**
+     * @brief store duplicated values by appending instead of replacing
+     */
     auto append() -> self&;
+    /**
+     * @brief help message for argument
+     */
     auto help(const std::string&) -> self&;
     auto help() const -> const std::string&;
+    /**
+     * @brief mark this argument required
+     */
     auto required() -> self&;
     // action
 private:
@@ -95,8 +99,14 @@ public:
     auto value() const -> bool;
 public:
     auto set_default(bool) -> self&;
+    /**
+     * @brief help message for argument
+     */
     auto help(const std::string&) -> self&;
     auto help() const -> const std::string&;
+    /**
+     * @brief mark this argument required
+     */
     auto required() -> self&;
 private:
     auto set_value(bool) -> void;
@@ -114,8 +124,14 @@ public:
 public:
     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
     template <typename _Tp> auto store_as() -> self&;
+    /**
+     * @brief help message for argument
+     */
     auto help(const std::string&) -> self&;
     auto help() const -> const std::string&;
+    /**
+     * @brief mark this argument required
+     */
     auto required() -> self&;
 private:
     auto set_value(const std::string&) -> void;
@@ -129,13 +145,28 @@ private:
 };
 
 
+/**
+ * @brief get argument value in specified type
+ * @param _i index of value (default = 0), do not use unless value's stored by appending
+ * @tparam _Tp specified type
+ * @throw std::out_of_range if %_i is an invalid index
+ * @throw std::bad_any_cast if fail to cast
+ */
 template <typename _Tp> auto optional_argument::value(size_t _i) const -> _Tp {
     return std::any_cast<_Tp>(_data.at(_i));
 }
+/**
+ * @brief argument value must be in choices if set
+ * @param _args value choices
+ */
 template <typename... _Args> auto optional_argument::choices(_Args&&... _args) -> self& {
     _M_choices(std::forward<_Args>(_args)...);
     return *this;
 }
+/**
+ * @brief store value in specified type
+ * @tparam _Tp specified type
+ */
 template <typename _Tp> auto optional_argument::store_as() -> self& {
     delete _store_handler; _store_handler = nullptr;
     _store_handler = new store_handler<_Tp>();
@@ -147,13 +178,27 @@ template <typename... _Args> auto optional_argument::_M_choices(const std::strin
 }
 
 
+/**
+ * @brief get argument value in specified type
+ * @tparam _Tp specified type
+ * @throw std::out_of_range if %_i is an invalid index
+ * @throw std::bad_any_cast if fail to cast
+ */
 template <typename _Tp> auto positional_argument::value() const -> _Tp {
     return std::any_cast<_Tp>(_data.value());
 }
+/**
+ * @brief argument value must be in choices if set
+ * @param _args value choices
+ */
 template <typename... _Args> auto positional_argument::choices(_Args&&... _args) -> self& {
     _M_choices(std::forward<_Args>(_args)...);
     return *this;
 }
+/**
+ * @brief store value in specified type
+ * @tparam _Tp specified type
+ */
 template <typename _Tp> auto positional_argument::store_as() -> self& {
     delete _store_handler; _store_handler = nullptr;
     _store_handler = new store_handler<_Tp>();

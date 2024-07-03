@@ -2,7 +2,7 @@
 
 int main(int _argc, char* _argv[]) {
     icy::argument_parser _parser;
-    _parser.add_optional_argument("-std=c++").store_as<unsigned>().set_default("3").help("standard").required();
+    _parser.add_optional_argument("-std=c++").store_as<unsigned>().set_default("3").choices("3","11","17","20").help("standard").required();
     _parser.add_optional_argument("o").help("output");
     _parser.add_optional_argument("l").help("lib").append();
     _parser.add_flag_argument("Wall").set_default(false).help("all warning");
