@@ -23,6 +23,7 @@ jobs:
         cd third
         git clone https://github.com/1nchy/trie_tree.git
         mkdir -p build
+        cd build
         cmake ..
         make
     - name: mkdir
