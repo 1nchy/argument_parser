@@ -22,6 +22,7 @@ struct virtual_store_handler;
 template <typename _Tp> struct store_handler;
 
 struct virtual_store_handler {
+    virtual ~virtual_store_handler() = default;
     virtual std::any save(const std::string&) = 0;
 };
 template <typename _Tp> struct store_handler : public virtual_store_handler {
