@@ -18,21 +18,6 @@ class positional_argument;
 class optional_argument;
 class flag_argument;
 
-struct virtual_store_handler;
-template <typename _Tp> struct store_handler;
-
-struct virtual_store_handler {
-    virtual ~virtual_store_handler() = default;
-    virtual std::any save(const std::string&) = 0;
-};
-template <typename _Tp> struct store_handler : public virtual_store_handler {
-    typedef _Tp value_type;
-    std::stringstream _ss;
-    std::any save(const std::string& _s) override {
-        _ss.clear(); _ss << _s;
-        value_type _v;  _ss >> _v; return _v;
-    }
-};
 
 class argument_parser;
 
@@ -40,6 +25,9 @@ class argument {
 public:
     class out_of_range;
     class lack_of_requisite;
+protected:
+    struct virtual_store_handler;
+    template <typename _Tp> struct store_handler;
 protected:
     argument(argument_parser* const);
 public:
@@ -175,6 +163,20 @@ public:
     lack_of_requisite& operator=(lack_of_requisite&&) = default;
     lack_of_requisite& operator=(const lack_of_requisite&) = default;
     virtual ~lack_of_requisite() = default;
+};
+
+
+struct argument::virtual_store_handler {
+    virtual ~virtual_store_handler() = default;
+    virtual std::any save(const std::string&) = 0;
+};
+template <typename _Tp> struct argument::store_handler : public virtual_store_handler {
+    typedef _Tp value_type;
+    std::stringstream _ss;
+    std::any save(const std::string& _s) override {
+        _ss.clear(); _ss << _s;
+        value_type _v;  _ss >> _v; return _v;
+    }
 };
 
 
