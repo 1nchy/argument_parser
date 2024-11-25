@@ -7,7 +7,7 @@ argument_parser::argument_parser(const std::string& _chars)
 
 auto argument_parser::add_positional_argument(size_t _k)
 -> positional_argument& {
-    auto _ptr = std::make_shared<positional_argument>(this);
+    auto _ptr = std::make_shared<positional_argument>(this, _k);
     _M_attach_positional_argument(_ptr, _k);
     return *_ptr;
 }
@@ -25,10 +25,10 @@ auto argument_parser::get_position(size_t _k) const
     return *(_positional_arguments.at(_k));
 }
 
-auto argument_parser::parse(int _argc, const char* const* _argv) -> bool {
-    return parse({_argv, _argc + _argv});
+auto argument_parser::parse(int _argc, const char* const* _argv) -> void {
+    parse({_argv, _argc + _argv});
 }
-auto argument_parser::parse(const std::vector<std::string>& _args) -> bool {
+auto argument_parser::parse(const std::vector<std::string>& _args) -> void {
     auto _i = _args.cbegin();
     auto _M_try_optional_argument = [&](const std::string& _s) -> bool {
         if (_s.empty()) return false;
@@ -62,7 +62,7 @@ auto argument_parser::parse(const std::vector<std::string>& _args) -> bool {
         else if (_M_try_flag_argument(*_i)) {}
         else if (_M_try_positional_argument(*_i)) {}
     }
-    return _M_required_verify();
+    _M_required_verify();
 }
 
 auto argument_parser::_M_attach_optional_argument(std::shared_ptr<optional_argument>)
@@ -74,17 +74,23 @@ auto argument_parser::_M_attach_positional_argument(std::shared_ptr<positional_a
     _positional_arguments[_k] = _ptr;
 }
 auto argument_parser::_M_required_verify() const
--> bool {
+-> void {
     for (const auto& _p : _optional_arguments) {
-        if (!_p.second->required_verify()) return false;
+        if (!_p.second->required_verify()) {
+            throw argument::lack_of_requisite(_p.first);
+        }
     }
     for (const auto& _p : _flag_arguments) {
-        if (!_p.second->required_verify()) return false;
+        if (!_p.second->required_verify()) {
+            throw argument::lack_of_requisite(_p.first);
+        }
     }
     for (const auto& _p : _positional_arguments) {
-        if (!_p.second->required_verify()) return false;
+        if (!_p.second->required_verify()) {
+            const std::string _msg = "position[" + std::to_string(_p.first) + "]";
+            throw argument::lack_of_requisite(_msg);
+        }
     }
-    return true;
 }
 auto argument_parser::_M_is_optional_argument(const std::string& _s) const -> bool {
     return _optional_arguments.contains(_s);
@@ -106,7 +112,7 @@ auto argument_parser::_M_update_positional_argument(size_t _k, const std::string
         _pa->set_value(_v);
     }
     else {
-        auto _pa = std::make_shared<positional_argument>(this);
+        auto _pa = std::make_shared<positional_argument>(this, _k);
         _M_attach_positional_argument(_pa, _k);
         _pa->set_value(_v);
     }

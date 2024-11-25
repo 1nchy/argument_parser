@@ -4,13 +4,17 @@ namespace icy {
 
 argument::argument(argument_parser* const _p) : _parser(_p) {}
 
+argument::out_of_range::out_of_range(const std::string& _s) : std::logic_error(_s) {}
+argument::out_of_range::out_of_range(const char* _s) : std::logic_error(_s) {}
+argument::lack_of_requisite::lack_of_requisite(const std::string& _s) : std::logic_error(_s) {}
+argument::lack_of_requisite::lack_of_requisite(const char* _s) : std::logic_error(_s) {}
 
-optional_argument::optional_argument(argument_parser* const _p) : argument(_p) {}
+
 optional_argument::~optional_argument() {
     delete _store_handler; _store_handler = nullptr;
 }
 auto optional_argument::has_value() const -> bool {
-    return _data.empty();
+    return !_data.empty();
 }
 auto optional_argument::size() const -> size_t {
     return _data.size();
@@ -36,7 +40,7 @@ auto optional_argument::required() -> self& {
 }
 auto optional_argument::set_value(const std::string& _s) -> void {
     if (!_choices.empty() && !_choices.contains(_s)) {
-        throw std::out_of_range("not in choices.");
+        throw argument::out_of_range(_keys.empty() ? "" : _keys.front());
     }
     if (_store_handler == nullptr) {
         _M_set_value(_s);
@@ -48,6 +52,7 @@ auto optional_argument::set_value(const std::string& _s) -> void {
 auto optional_argument::required_verify() const -> bool {
     return !_required || has_value();
 }
+auto optional_argument::_M_set_key() -> void {}
 auto optional_argument::_M_choices() -> void {}
 auto optional_argument::_M_set_value(const std::any& _v) -> void {
     if (!_append) { // single
@@ -64,7 +69,6 @@ auto optional_argument::_M_set_value(const std::any& _v) -> void {
 }
 
 
-flag_argument::flag_argument(argument_parser* const _p) : argument(_p) {}
 auto flag_argument::set_default(bool _b) -> self& {
     set_value(_b);
     return *this;
@@ -92,9 +96,10 @@ auto flag_argument::set_value(bool _b) -> void {
 auto flag_argument::required_verify() const -> bool {
     return !_required || _data.has_value();
 }
+auto flag_argument::_M_set_key() -> void {}
 
 
-positional_argument::positional_argument(argument_parser* const _p) : argument(_p) {}
+positional_argument::positional_argument(argument_parser* const _p, size_t _k) : argument(_p), _key(_k) {}
 auto positional_argument::has_value() const -> bool {
     return _data.has_value();
 }
@@ -111,7 +116,8 @@ auto positional_argument::required() -> self& {
 }
 auto positional_argument::set_value(const std::string& _s) -> void {
     if (!_choices.empty() && !_choices.contains(_s)) {
-        throw std::out_of_range("not in choices.");
+        const std::string _msg = "position[" + std::to_string(_key) + "]";
+        throw argument::out_of_range(_msg);
     }
     if (_store_handler == nullptr) {
         _data = _s;

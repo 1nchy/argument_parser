@@ -47,8 +47,13 @@ public:
     auto get_option(const std::string&) const -> const optional_argument&;
     auto get_flag(const std::string&) const -> const flag_argument&;
     auto get_position(size_t) const -> const positional_argument&;
-    auto parse(int, const char* const*) -> bool;
-    auto parse(const std::vector<std::string>&) -> bool;
+    auto parse(int, const char* const*) -> void;
+    /**
+     * @brief parse arguments
+     * @throw `argument::out_of_range` not in choices
+     * @throw `argument::lack_of_requisite` lack of required arguments
+     */
+    auto parse(const std::vector<std::string>&) -> void;
 private:
     template <typename... _Args> auto
         _M_attach_optional_argument(std::shared_ptr<optional_argument>, const std::string&, _Args&&... _args) -> void;
@@ -57,7 +62,7 @@ private:
         _M_attach_flag_argument(std::shared_ptr<flag_argument>, const std::string&, _Args&&... _args) -> void;
     auto _M_attach_flag_argument(std::shared_ptr<flag_argument>) -> void;
     auto _M_attach_positional_argument(std::shared_ptr<positional_argument>, size_t) -> void;
-    auto _M_required_verify() const -> bool;
+    auto _M_required_verify() const -> void;
     auto _M_is_optional_argument(const std::string&) const -> bool;
     auto _M_is_flag_argument(const std::string&) const -> bool;
     auto _M_update_optional_argument(const std::string&, const std::string&) -> void;
@@ -78,7 +83,7 @@ argument_parser::add_optional_argument(_Args&&... _args)
     if (sizeof...(_Args) == 0) {
         throw std::length_error("zero argument.");
     }
-    auto _ptr = std::make_shared<optional_argument>(this);
+    auto _ptr = std::make_shared<optional_argument>(this, std::forward<_Args>(_args)...);
     _M_attach_optional_argument(_ptr, std::forward<_Args>(_args)...);
     return *_ptr;
 }
@@ -88,7 +93,7 @@ argument_parser::add_flag_argument(_Args&&... _args)
     if (sizeof...(_Args) == 0) {
         throw std::length_error("zero argument.");
     }
-    auto _ptr = std::make_shared<flag_argument>(this);
+    auto _ptr = std::make_shared<flag_argument>(this, std::forward<_Args>(_args)...);
     _M_attach_flag_argument(_ptr, std::forward<_Args>(_args)...);
     return *_ptr;
 }
