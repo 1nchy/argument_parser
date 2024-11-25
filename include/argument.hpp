@@ -18,8 +18,6 @@ class positional_argument;
 class optional_argument;
 class flag_argument;
 
-namespace {
-
 struct virtual_store_handler;
 template <typename _Tp> struct store_handler;
 
@@ -36,8 +34,6 @@ template <typename _Tp> struct store_handler : public virtual_store_handler {
 private:
     std::stringstream _ss;
 };
-
-}
 
 class argument_parser;
 
@@ -72,7 +68,6 @@ public:
     template <typename _Tp = std::string> auto value(size_t _i = 0) const -> _Tp;
 public:
     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
-    template <typename _Tp> auto store_as() -> self&;
     /**
      * @brief store duplicated values by appending instead of replacing
      */
@@ -88,6 +83,7 @@ public:
     auto required() -> self&;
     // action
 private:
+    template <typename _Tp> auto store_as() -> self&;
     auto set_value(const std::string&) -> void;
     auto required_verify() const -> bool;
     template <typename... _Args> auto _M_set_key(const std::string&, _Args&&...) -> void;
@@ -211,7 +207,9 @@ template <typename... _Args> auto optional_argument::choices(_Args&&... _args) -
  */
 template <typename _Tp> auto optional_argument::store_as() -> self& {
     delete _store_handler; _store_handler = nullptr;
-    _store_handler = new store_handler<_Tp>();
+    if constexpr (!std::is_same<_Tp, std::string>::value) {
+        _store_handler = new store_handler<_Tp>();
+    }
     return *this;
 }
 template <typename... _Args> auto optional_argument::_M_set_key(const std::string& _s, _Args&&... _args) -> void {

@@ -3,12 +3,12 @@
 int main(int _argc, char* _argv[]) {
     icy::argument_parser _parser;
 
-    _parser.add_optional_argument("-std=c++").help("compilation standard")
-        .store_as<unsigned>().choices("3","11","17","20").set_default("3");
+    _parser.add_optional_argument<unsigned>("-std=c++").help("compilation standard")
+        .choices("3","11","17","20").set_default("3");
     _parser.add_optional_argument("o").help("output")
         .set_default("a.out");
-    _parser.add_optional_argument("O").help("optimization level")
-        .store_as<unsigned>().choices("0", "1", "2", "3").set_default("1");
+    _parser.add_optional_argument<unsigned>("O").help("optimization level")
+        .choices("0", "1", "2", "3").set_default("1");
     _parser.add_optional_argument("l").help("library name")
         .append();
     _parser.add_optional_argument("L").help("library path")

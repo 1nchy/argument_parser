@@ -26,9 +26,12 @@ public:
     virtual ~argument_parser() = default;
     /**
      * @brief add optional argument
+     * @param _Tp store type (std::string by default)
      * @param _args string key of argument
      * @return reference to argument object
      */
+    template <typename _Tp, typename... _Args> auto
+        add_optional_argument(_Args&&... _args) -> optional_argument&;
     template <typename... _Args> auto
         add_optional_argument(_Args&&... _args) -> optional_argument&;
     /**
@@ -80,6 +83,17 @@ private:
     trie_tree _optional_keys;
 };
 
+template <typename _Tp, typename... _Args> auto
+argument_parser::add_optional_argument(_Args&&... _args)
+-> optional_argument& {
+    if (sizeof...(_Args) == 0) {
+        throw std::length_error("zero argument.");
+    }
+    auto _ptr = std::make_shared<optional_argument>(this, std::forward<_Args>(_args)...);
+    _ptr->template store_as<_Tp>();
+    _M_attach_optional_argument(_ptr, std::forward<_Args>(_args)...);
+    return *_ptr;
+}
 template <typename... _Args> auto
 argument_parser::add_optional_argument(_Args&&... _args)
 -> optional_argument& {
