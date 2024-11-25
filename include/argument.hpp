@@ -27,12 +27,11 @@ struct virtual_store_handler {
 };
 template <typename _Tp> struct store_handler : public virtual_store_handler {
     typedef _Tp value_type;
+    std::stringstream _ss;
     std::any save(const std::string& _s) override {
         _ss.clear(); _ss << _s;
         value_type _v;  _ss >> _v; return _v;
     }
-private:
-    std::stringstream _ss;
 };
 
 class argument_parser;
