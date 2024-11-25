@@ -44,6 +44,9 @@ public:
      * @return reference to argument object
      */
     auto add_positional_argument(size_t _k) -> positional_argument&;
+    auto contain_option(const std::string&) const -> bool;
+    auto contain_flag(const std::string&) const -> bool;
+    auto contain_position(size_t) const -> bool;
     auto get_option(const std::string&) const -> const optional_argument&;
     auto get_flag(const std::string&) const -> const flag_argument&;
     auto get_position(size_t) const -> const positional_argument&;

@@ -12,6 +12,18 @@ auto argument_parser::add_positional_argument(size_t _k)
     return *_ptr;
 }
 
+auto argument_parser::contain_option(const std::string& _k) const
+-> bool {
+    return _optional_arguments.contains(_k);
+}
+auto argument_parser::contain_flag(const std::string& _k) const
+-> bool {
+    return _flag_arguments.contains(_k);
+}
+auto argument_parser::contain_position(size_t _k) const
+-> bool {
+    return _positional_arguments.contains(_k);
+}
 auto argument_parser::get_option(const std::string& _k) const
 -> const optional_argument& {
     return *(_optional_arguments.at(_k));
