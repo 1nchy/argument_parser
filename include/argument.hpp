@@ -43,17 +43,25 @@ protected:
     bool _required = false;             // 参数是否必需
 };
 
+/**
+ * @brief optional argument
+ * @details store duplicated values by replacing, unless `append()` is called
+ */
 class optional_argument : public argument {
     typedef optional_argument self;
     friend class argument_parser;
 public:
     template <typename... _Args> optional_argument(argument_parser* const, _Args&&...);
     virtual ~optional_argument();
+public:
     auto set_default(const std::string&) -> self&;
     auto has_value() const -> bool;
+    /**
+     * @return the size of value collection, if `append()` has been set
+     */
     auto size() const -> size_t;
     template <typename _Tp = std::string> auto value(size_t _i = 0) const -> _Tp;
-public:
+    auto raw_value(size_t _i = 0) const -> const std::any&;
     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
     /**
      * @brief store duplicated values by appending instead of replacing
@@ -63,6 +71,9 @@ public:
      * @brief help message for argument
      */
     auto help(const std::string&) -> self&;
+    /**
+     * @return help message
+     */
     auto help() const -> const std::string&;
     /**
      * @brief mark this argument required
@@ -90,14 +101,18 @@ class flag_argument : public argument {
     friend class argument_parser;
 public:
     template <typename... _Args> flag_argument(argument_parser* const, _Args&&...);
-    auto has_value() const -> bool;
-    auto value() const -> bool;
+    virtual ~flag_argument() = default;
 public:
     auto set_default(bool) -> self&;
+    auto has_value() const -> bool;
+    auto value() const -> bool;
     /**
      * @brief help message for argument
      */
     auto help(const std::string&) -> self&;
+    /**
+     * @return help message
+     */
     auto help() const -> const std::string&;
     /**
      * @brief mark this argument required
@@ -117,15 +132,20 @@ class positional_argument : public argument {
     friend class argument_parser;
 public:
     positional_argument(argument_parser* const, size_t);
+    virtual ~positional_argument() = default;
+public:
     auto has_value() const -> bool;
     template <typename _Tp = std::string> auto value() const -> _Tp;
-public:
+    auto raw_value() const -> const std::any&;
     template <typename... _Args> auto choices(_Args&&... _args) -> self&;
     template <typename _Tp> auto store_as() -> self&;
     /**
      * @brief help message for argument
      */
     auto help(const std::string&) -> self&;
+    /**
+     * @return help message
+     */
     auto help() const -> const std::string&;
     /**
      * @brief mark this argument required

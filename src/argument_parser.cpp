@@ -36,6 +36,10 @@ auto argument_parser::get_position(size_t _k) const
 -> const positional_argument& {
     return *(_positional_arguments.at(_k));
 }
+auto argument_parser::get_position() const
+-> size_t {
+    return _positional_arguments.size();
+}
 
 auto argument_parser::parse(int _argc, const char* const* _argv) -> void {
     parse({_argv, _argc + _argv});

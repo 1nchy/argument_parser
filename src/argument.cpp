@@ -13,15 +13,18 @@ argument::lack_of_requisite::lack_of_requisite(const char* _s) : std::logic_erro
 optional_argument::~optional_argument() {
     delete _store_handler; _store_handler = nullptr;
 }
+auto optional_argument::set_default(const std::string& _s) -> self& {
+    set_value(_s);
+    return *this;
+}
 auto optional_argument::has_value() const -> bool {
     return !_data.empty();
 }
 auto optional_argument::size() const -> size_t {
     return _data.size();
 }
-auto optional_argument::set_default(const std::string& _s) -> self& {
-    set_value(_s);
-    return *this;
+auto optional_argument::raw_value(size_t _i) const -> const std::any& {
+    return _data.at(_i);
 }
 auto optional_argument::append() -> self& {
     _append = true;
@@ -102,6 +105,9 @@ auto flag_argument::_M_set_key() -> void {}
 positional_argument::positional_argument(argument_parser* const _p, size_t _k) : argument(_p), _key(_k) {}
 auto positional_argument::has_value() const -> bool {
     return _data.has_value();
+}
+auto positional_argument::raw_value() const -> const std::any& {
+    return _data.value();
 }
 auto positional_argument::help(const std::string& _c) -> self& {
     _comment = _c;

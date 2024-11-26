@@ -19,6 +19,10 @@ class argument_parser;
 class argument_parser {
     typedef argument_parser self;
 public:
+    /**
+     * @brief argument_parser construtor
+     * @param _prefix_chars the prefix char of arguments ("-" by default)
+     */
     argument_parser(const std::string& _prefix_chars = "-");
     argument_parser(const self&) = delete;
     argument_parser(self&&) = default;
@@ -47,12 +51,34 @@ public:
      * @return reference to argument object
      */
     auto add_positional_argument(size_t _k) -> positional_argument&;
+    /**
+     * @return whether contains optional argument
+     */
     auto contain_option(const std::string&) const -> bool;
+    /**
+     * @return whether contains flag argument
+     */
     auto contain_flag(const std::string&) const -> bool;
+    /**
+     * @return whether contains positional argument
+     */
     auto contain_position(size_t) const -> bool;
+    /**
+     * @brief get optional argument
+     */
     auto get_option(const std::string&) const -> const optional_argument&;
+    /**
+     * @brief get flag argument
+     */
     auto get_flag(const std::string&) const -> const flag_argument&;
+    /**
+     * @brief get positional argument
+     */
     auto get_position(size_t) const -> const positional_argument&;
+    /**
+     * @brief get the size of positional arguments
+     */
+    auto get_position() const -> size_t;
     auto parse(int, const char* const*) -> void;
     /**
      * @brief parse arguments

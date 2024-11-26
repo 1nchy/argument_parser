@@ -1,5 +1,10 @@
 #include "argument_parser.hpp"
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 int main(int _argc, char* _argv[]) {
     icy::argument_parser _parser;
 
@@ -24,8 +29,6 @@ int main(int _argc, char* _argv[]) {
         .set_default(false);
     _parser.add_flag_argument("g").help("debug information")
         .set_default(false);
-    _parser.add_flag_argument("w").help("no warnings")
-        .set_default(false);
     _parser.add_flag_argument("Wall").help("output all warnings")
         .set_default(false);
     _parser.add_flag_argument("Werror").help("break with any warning")
@@ -40,12 +43,36 @@ int main(int _argc, char* _argv[]) {
         "g++", "--std=c++11", "-Wall", "-oa.out", "-o", "main", "main.cpp", "-lmath", "src.cpp", "-lpthread"
     };
     _parser.parse(_args);
-    auto _o0 = _parser.get_option("-std=c++").value<unsigned>();
-    auto _o1 = _parser.get_option("o").value();
-    auto _o2 = _parser.get_option("l").value(0);
-    auto _o3 = _parser.get_option("l").value(1);
-    auto _p0 = _parser.get_position(0).value();
-    auto _p1 = _parser.get_position(1).value();
-    auto f0 = _parser.get_flag("Wall").value();
+
+    cout << "compiler = { " << _parser.get_position(0).value() << " }" << endl;
+    cout << "c++ standard = { " << _parser.get_option("-std=c++").value<unsigned>() << " }" << endl;
+    cout << "input file = { ";
+    for (size_t _i = 1; _i < _parser.get_position(); ++_i) {
+        cout << _parser.get_position(_i).value() << " ";
+    }
+    cout << "}" << endl;
+    cout << "output file = { " << _parser.get_option("o").value() << " }" << endl;
+    cout << "include path = { ";
+    for (size_t _i = 0; _i < _parser.get_option("I").size(); ++_i) {
+        cout << _parser.get_option("I").value(_i) << " ";
+    }
+    cout << "}" << endl;
+    cout << "library path = { ";
+    for (size_t _i = 0; _i < _parser.get_option("L").size(); ++_i) {
+        cout << _parser.get_option("L").value(_i) << " ";
+    }
+    cout << "}" << endl;
+    cout << "library name = { ";
+    for (size_t _i = 0; _i < _parser.get_option("l").size(); ++_i) {
+        cout << _parser.get_option("l").value(_i) << " ";
+    }
+    cout << "}" << endl;
+
+    if (_parser.get_flag("Wall").value()) {
+        cout << _parser.get_flag("Wall").help() << endl;
+    }
+    if (_parser.get_flag("Werror").value()) {
+        cout << _parser.get_flag("Werror").help() << endl;
+    }
     return 0;
 }
